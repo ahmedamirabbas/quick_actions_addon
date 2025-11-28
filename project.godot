@@ -18,6 +18,7 @@ config/icon="res://addons/quick_actions/icon.svg"
 [autoload]
 
 QuickActionsPanel="res://addons/quick_actions/quick_actions_panel.tscn"
+QuickActionsRuntime="*res://addons/quick_actions/quick_actions_runtime.gd"
 
 [editor_plugins]
 

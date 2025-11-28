@@ -3,7 +3,6 @@
 [node name="Test scene" type="Node2D"]
 
 [node name="TextureRect" type="ColorRect" parent="."]
-visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0

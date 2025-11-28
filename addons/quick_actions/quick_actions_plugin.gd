@@ -1,4 +1,3 @@
-# quick_actions_plugin.gd
 @tool
 extends EditorPlugin
 
@@ -12,13 +11,10 @@ func _enter_tree() -> void:
 	button.pressed.connect(_toggle_panel)
 	add_control_to_container(EditorPlugin.CONTAINER_TOOLBAR, button)
 	
-	# Register autoload if not already present
-	if not ProjectSettings.has_setting("autoload/QuickActionsPanel"):
-		ProjectSettings.set_setting("autoload/QuickActionsPanel", "res://addons/quick_actions/quick_actions_panel.tscn")
-		ProjectSettings.save()
-		print("Quick Actions autoload added.")
-
-	# Load panel scene
+	# Register runtime autoload
+	add_autoload_singleton("QuickActionsRuntime", "res://addons/quick_actions/quick_actions_runtime.gd")
+	
+	# Load panel scene for EDITOR ONLY
 	var panel_scene: PackedScene = preload("res://addons/quick_actions/quick_actions_panel.tscn")
 	panel_instance = panel_scene.instantiate()
 	panel_instance.hide()
@@ -33,13 +29,9 @@ func _exit_tree() -> void:
 	
 	if panel_instance:
 		panel_instance.queue_free()
-		
-	# Remove autoload when addon is disabled
-	if ProjectSettings.has_setting("autoload/QuickActionsPanel"):
-		ProjectSettings.set_setting("autoload/QuickActionsPanel", null)
-		ProjectSettings.save()
-		print("Quick Actions autoload removed.")
-
+	
+	# Remove autoload
+	remove_autoload_singleton("QuickActionsRuntime")
 
 func _toggle_panel() -> void:
 	if panel_instance:

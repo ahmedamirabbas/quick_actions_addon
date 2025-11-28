@@ -37,6 +37,12 @@ const HOTKEY_TIMESCALE_DOWN: String = "quick_action_speed_down"
 const HOTKEY_TIMESCALE_RESET: String = "quick_action_speed_reset"
 
 func _ready() -> void:
+	# CRITICAL: Ensure mouse interaction works in CanvasLayer
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	
+	# Make sure we're processing input
+	set_process_input(true)
+	
 	# Set initial size (but allow resizing)
 	custom_minimum_size = MIN_SIZE
 	size = Vector2(240, 280)
