@@ -6,9 +6,28 @@ extends PanelContainer
 @onready var fps_btn: Button = %FPSButton
 @onready var timescale_slider: HSlider = %TimescaleSlider
 @onready var timescale_label: Label = %TimescaleLabel
+@onready var minimize_btn: Button = %MinimizeButton
+@onready var content_container: VBoxContainer = %ContentContainer
 
 var fps_counter: Control
 var is_fps_visible: bool = false
+
+# Dragging variables
+var dragging: bool = false
+var drag_offset: Vector2
+
+# Resizing variables
+var resizing: bool = false
+var resize_start_pos: Vector2
+var resize_start_size: Vector2
+const RESIZE_MARGIN: float = 10.0
+const MIN_SIZE: Vector2 = Vector2(200, 250)
+const MAX_SIZE: Vector2 = Vector2(400, 600)
+
+# Minimize variables
+var is_minimized: bool = false
+var expanded_size: Vector2
+const MINIMIZED_HEIGHT: float = 50.0
 
 const HOTKEY_SCREENSHOT: String = "quick_action_screenshot"
 const HOTKEY_RELOAD: String = "quick_action_reload"
@@ -18,17 +37,22 @@ const HOTKEY_TIMESCALE_DOWN: String = "quick_action_speed_down"
 const HOTKEY_TIMESCALE_RESET: String = "quick_action_speed_reset"
 
 func _ready() -> void:
-	# Force compact size
-	custom_minimum_size = Vector2(240, 280)
+	# Set initial size (but allow resizing)
+	custom_minimum_size = MIN_SIZE
 	size = Vector2(240, 280)
+	expanded_size = size
+	
+	# Enable mouse filter
+	mouse_filter = Control.MOUSE_FILTER_STOP
 	
 	# Connect buttons
 	screenshot_btn.pressed.connect(_on_screenshot_pressed)
 	reload_btn.pressed.connect(_on_reload_pressed)
 	fps_btn.pressed.connect(_on_fps_toggle_pressed)
 	timescale_slider.value_changed.connect(_on_timescale_changed)
+	minimize_btn.pressed.connect(_on_minimize_pressed)
 	
-	# Setup dragging
+	# Setup input handling
 	gui_input.connect(_on_panel_input)
 	
 	# Register hotkeys (only works during runtime)
@@ -44,9 +68,26 @@ func _position_panel() -> void:
 	if is_inside_tree():
 		var viewport_size := get_viewport().get_visible_rect().size
 		position = Vector2(
-			viewport_size.x - custom_minimum_size.x - 20,
-			viewport_size.y - custom_minimum_size.y - 20
+			viewport_size.x - size.x - 20,
+			viewport_size.y - size.y - 20
 		)
+
+func _on_minimize_pressed() -> void:
+	is_minimized = !is_minimized
+	
+	if is_minimized:
+		# Save current size and minimize
+		expanded_size = size
+		content_container.hide()
+		minimize_btn.text = "+"
+		custom_minimum_size = Vector2(size.x, MINIMIZED_HEIGHT)
+		size = Vector2(size.x, MINIMIZED_HEIGHT)
+	else:
+		# Restore to expanded size
+		content_container.show()
+		minimize_btn.text = "−"
+		custom_minimum_size = MIN_SIZE
+		size = expanded_size
 
 func _register_hotkeys() -> void:
 	if not InputMap.has_action(HOTKEY_SCREENSHOT):
@@ -127,20 +168,63 @@ func _input(event: InputEvent) -> void:
 		timescale_slider.value = 1.0
 		viewport.set_input_as_handled()
 
-var dragging: bool = false
-var drag_offset: Vector2
+func _is_in_resize_zone(mouse_pos: Vector2) -> bool:
+	# Don't allow resizing when minimized
+	if is_minimized:
+		return false
+	
+	var local_pos := mouse_pos - global_position
+	var panel_size := size
+	
+	# Check if near bottom-right corner
+	return (local_pos.x >= panel_size.x - RESIZE_MARGIN and 
+			local_pos.y >= panel_size.y - RESIZE_MARGIN)
 
 func _on_panel_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
-				dragging = true
-				drag_offset = get_global_mouse_position() - global_position
+				var mouse_pos := get_global_mouse_position()
+				
+				# Check if clicking in resize zone
+				if _is_in_resize_zone(mouse_pos):
+					resizing = true
+					resize_start_pos = mouse_pos
+					resize_start_size = size
+				else:
+					# Start dragging
+					dragging = true
+					drag_offset = mouse_pos - global_position
 			else:
+				# Stop both dragging and resizing
 				dragging = false
+				resizing = false
 	
-	elif event is InputEventMouseMotion and dragging:
-		global_position = get_global_mouse_position() - drag_offset
+	elif event is InputEventMouseMotion:
+		if resizing:
+			# Handle resize
+			var mouse_pos := get_global_mouse_position()
+			var delta := mouse_pos - resize_start_pos
+			var new_size := resize_start_size + delta
+			
+			# Clamp to min/max size
+			new_size.x = clamp(new_size.x, MIN_SIZE.x, MAX_SIZE.x)
+			new_size.y = clamp(new_size.y, MIN_SIZE.y, MAX_SIZE.y)
+			
+			size = new_size
+			custom_minimum_size = new_size
+			expanded_size = new_size  # Update expanded size while resizing
+			
+		elif dragging:
+			# Handle drag
+			var mouse_pos := get_global_mouse_position()
+			global_position = mouse_pos - drag_offset
+		else:
+			# Update cursor based on position
+			if _is_in_resize_zone(get_global_mouse_position()):
+				mouse_default_cursor_shape = Control.CURSOR_FDIAGSIZE
+			else:
+				mouse_default_cursor_shape = Control.CURSOR_ARROW
 
 func _on_screenshot_pressed() -> void:
 	if not Engine.is_editor_hint():

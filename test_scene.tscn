@@ -1,3 +1,14 @@
 [gd_scene format=3 uid="uid://cf51sw3bbpc1m"]
 
 [node name="Test scene" type="Node2D"]
+
+[node name="TextureRect" type="ColorRect" parent="."]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1200.0
+offset_bottom = 720.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.07715472, 8.1088285e-05, 0.23081616, 1)
