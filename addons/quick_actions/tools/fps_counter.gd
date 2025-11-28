@@ -1,3 +1,4 @@
+# fps_counter.gd
 extends Control
 
 @onready var fps_label: Label = $Label
