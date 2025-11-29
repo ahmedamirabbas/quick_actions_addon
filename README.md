@@ -160,7 +160,7 @@ Files are named: `screenshot_YYYY-MM-DDTHH-MM-SS.png`
 If this plugin saves you time, consider:
 
 - ⭐ Starring on GitHub
-- 💬 Leaving a review on Itch.io
+- 💬 Leaving a review on [Itch.io](https://ahmedamirdev.itch.io/quick-actions-addon)
 - ☕ Supporting on [Ko-fi](https://ko-fi.com/ahmedamirdev)
 - 📢 Sharing with other Godot developers
 
