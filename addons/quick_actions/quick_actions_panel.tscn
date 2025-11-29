@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://04lsquuy5767"]
 
-[ext_resource type="Script" uid="uid://c57qsry6xgb6c" path="res://addons/quick_actions/quick_actions_panel.gd" id="1_6jd18"]
+[ext_resource type="Script" uid="uid://c57qsry6xgb6c" path="res://quick_actions_panel_v1.0.0/quick_actions_panel.gd" id="1_6jd18"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6jd18"]
 bg_color = Color(0.16470589, 0.16470589, 0.16470589, 0.93333334)
@@ -23,10 +23,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -56.0
-offset_top = -317.0
-offset_right = 184.0
-offset_bottom = -37.0
+offset_left = -1410.0
+offset_top = -946.0
+offset_right = -1170.0
+offset_bottom = -666.0
 grow_horizontal = 0
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_6jd18")

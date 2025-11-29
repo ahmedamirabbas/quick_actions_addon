@@ -13,11 +13,9 @@ config_version=5
 config/name="Quick Actions Addon"
 run/main_scene="uid://04lsquuy5767"
 config/features=PackedStringArray("4.5", "Forward Plus")
-config/icon="res://addons/quick_actions/icon.svg"
 
 [autoload]
 
-QuickActionsPanel="res://addons/quick_actions/quick_actions_panel.tscn"
 QuickActionsRuntime="*res://addons/quick_actions/quick_actions_runtime.gd"
 
 [editor_plugins]

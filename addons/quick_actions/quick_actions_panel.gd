@@ -237,27 +237,42 @@ func _on_screenshot_pressed() -> void:
 		print("⚠ Screenshot works only during runtime (press Play button first)")
 		return
 	
-	# Find what to hide (CanvasLayer if exists, otherwise self)
-	var node_to_hide: Node = self
+	# Find and hide CanvasLayer
+	var canvas_layer: CanvasLayer = null
 	if get_parent() is CanvasLayer:
-		node_to_hide = get_parent()
+		canvas_layer = get_parent()
+		canvas_layer.visible = false
 	
-	# Hide before screenshot
-	node_to_hide.hide()
+	# Hide FPS counter if visible
+	var fps_was_visible: bool = false
+	if fps_counter and fps_counter.visible:
+		fps_was_visible = true
+		fps_counter.hide()
+	
+	# Wait for render to update
+	await get_tree().process_frame
 	await get_tree().process_frame
 	
 	# Capture screenshot
-	var viewport: Viewport = get_viewport()
+	var viewport: Viewport = get_tree().root
 	var image: Image = viewport.get_texture().get_image()
 	
 	var timestamp: String = Time.get_datetime_string_from_system().replace(":", "-")
 	var path: String = "user://screenshot_%s.png" % timestamp
 	
-	image.save_png(path)
-	print("✓ Screenshot saved: %s" % ProjectSettings.globalize_path(path))
+	var error := image.save_png(path)
 	
-	# Show again
-	node_to_hide.show()
+	if error == OK:
+		print("✓ Screenshot saved: %s" % ProjectSettings.globalize_path(path))
+	else:
+		print("✗ Screenshot failed with error code: %d" % error)
+	
+	# Restore visibility
+	if canvas_layer:
+		canvas_layer.visible = true
+	
+	if fps_was_visible:
+		fps_counter.show()
 
 func _on_reload_pressed() -> void:
 	if Engine.is_editor_hint():
