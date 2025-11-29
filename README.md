@@ -4,7 +4,7 @@
 
 Stop clicking through menus. Get instant access to screenshot capture, scene reloading, FPS monitoring, and timescale control—all in one draggable, resizable panel.
 
-![Quick Actions Panel](quick_actions_panel_v1.0.0/screenshots/hero_shot.png)
+![Quick Actions Panel](quick_actions_panel_v1.0.0/screenshots/in_action.gif)
 
 ## Features
 
