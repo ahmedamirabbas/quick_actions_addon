@@ -15,7 +15,7 @@ func _ready() -> void:
 	panel_instance.show()
 
 func _input(event: InputEvent) -> void:
-	# Toggle panel with a hotkey (Ctrl+Shift+Q)
+	# Toggle panel show/hide with a hotkey (Ctrl+Shift+Q)
 	if event is InputEventKey:
 		if event.pressed and event.keycode == KEY_Q and event.ctrl_pressed and event.shift_pressed:
 			if panel_instance:

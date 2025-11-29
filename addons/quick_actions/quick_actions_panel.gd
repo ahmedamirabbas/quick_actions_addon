@@ -233,17 +233,31 @@ func _on_panel_input(event: InputEvent) -> void:
 				mouse_default_cursor_shape = Control.CURSOR_ARROW
 
 func _on_screenshot_pressed() -> void:
-	if not Engine.is_editor_hint():
-		var viewport: Viewport = get_viewport()
-		var image: Image = viewport.get_texture().get_image()
-		
-		var timestamp: String = Time.get_datetime_string_from_system().replace(":", "-")
-		var path: String = "user://screenshot_%s.png" % timestamp
-		
-		image.save_png(path)
-		print("✓ Screenshot saved: %s" % ProjectSettings.globalize_path(path))
-	else:
+	if Engine.is_editor_hint():
 		print("⚠ Screenshot works only during runtime (press Play button first)")
+		return
+	
+	# Find what to hide (CanvasLayer if exists, otherwise self)
+	var node_to_hide: Node = self
+	if get_parent() is CanvasLayer:
+		node_to_hide = get_parent()
+	
+	# Hide before screenshot
+	node_to_hide.hide()
+	await get_tree().process_frame
+	
+	# Capture screenshot
+	var viewport: Viewport = get_viewport()
+	var image: Image = viewport.get_texture().get_image()
+	
+	var timestamp: String = Time.get_datetime_string_from_system().replace(":", "-")
+	var path: String = "user://screenshot_%s.png" % timestamp
+	
+	image.save_png(path)
+	print("✓ Screenshot saved: %s" % ProjectSettings.globalize_path(path))
+	
+	# Show again
+	node_to_hide.show()
 
 func _on_reload_pressed() -> void:
 	if Engine.is_editor_hint():
